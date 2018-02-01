@@ -1,0 +1,19 @@
+// street_cabinet is an object type, i.e. a tag in OSM mostly used for nodes
+// OSAK are OSM nodes denoting a danish street address
+//
+// This query is for co-relating street_cabinet with OSAK node to produce a list of cabniets with an approximated street address that can be used for GSM Navigation
+
+
+[out:json][timeout:25];
+
+node["man_made"="street_cabinet"]({{bbox}});
+
+// Loop over each node in the inbound stream and find the OSAK nodes within a given distance
+foreach->.p
+  (
+  	(       // Doing a union of the .p node we loop over and the resulting OSAK node
+      .p;
+  		node(around.p:25)["osak:identifier"];
+     );
+out body;
+);
